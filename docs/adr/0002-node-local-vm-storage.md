@@ -1,7 +1,5 @@
 # ADR-002: Keep VM disks on each node's local storage, with redundancy in the services
 
-Accepted on Nov 17, 2026, by Daniel Faktor.
-
 ## Context
 
 Core services are moving onto the Proxmox cluster: DNS (a Technitium pair, replacing the Pi-hole) and the reverse proxy (Nginx Proxy Manager). The Raspberry Pis stay for Docker and container workloads.

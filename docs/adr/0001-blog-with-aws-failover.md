@@ -1,10 +1,8 @@
 # ADR-001: Serve the blog from the homelab, with failover to a static copy in AWS
 
-Accepted on Nov 16, 2026, by Daniel Faktor.
-
 ## Context
 
-blog.danielfaktor.com needs to be public by Jan 17, 2027. The blog is also the proof of a platform project, so where it runs is part of the point: it should run on the Kubernetes cluster in my homelab, not on a hosting service.
+blog.danielfaktor.com needs to be public. The blog is also the proof of a platform project, so where it runs is part of the point: it should run on the Kubernetes cluster in my homelab, not on a hosting service.
 
 A homelab is not a reliable origin. Power, updates, hardware swaps and my own experiments will take it down, sometimes for hours. The home connection sits behind double NAT, so port forwarding is not practical, and I don't want the home network listening on the internet at all.
 
@@ -47,14 +45,14 @@ The constraints:
 - No inbound ports at home; the home IP never appears in DNS and can change without breaking the tunnel.
 - Traffic from AWS is held to one destination and one port by the same firewall that guards the rest of the lab.
 - About $8 a month always on, mostly the relay's instance and public IPv4 address.
-- The failover can be tested on purpose by stopping WordPress, cutting the tunnel or powering off the cluster. Game day 1 on Jan 31, 2027 does exactly that.
+- The failover can be tested on purpose by stopping WordPress, cutting the tunnel or powering off the cluster. A planned game day does exactly that.
 
 ### Costs and trade-offs
 - No comments, now or later, unless a separate service handles them.
 - The mirror can lag. A post published while the lab is down doesn't exist until the lab returns, and edits appear in the mirror only after the next sync.
-- IPsec through double NAT is unproven here. The router dials out, which should pass through, and the Jan 4 week tests it. The fallback is a WireGuard client on a VM in the isolated VM network, dialing the same relay.
+- IPsec through double NAT is unproven here. The router dials out, which should pass through, but it needs testing. The fallback is a WireGuard client on a VM in the isolated VM network, dialing the same relay.
 - The tunnel is a door into the lab, so it stays narrow: one source, one destination, one port, and a pre-shared key that never enters this repo.
 - There is one server to patch. The relay is the only always-on instance; it is rebuilt from code, not maintained by hand.
 - Lambda@Edge runs twice on a failover (once per origin), so the function has to check which origin it's handling.
-- There are more moving parts than plain hosting. The relay, the tunnel and its firewall rules, the sync job and the origin group all need monitoring. The SLO probes in February cover the public URL and the origin separately.
+- There are more moving parts than plain hosting. The relay, the tunnel and its firewall rules, the sync job and the origin group all need monitoring. SLO probes will cover the public URL and the origin separately.
 - Lambda@Edge needs Lambda and CloudWatch Logs allowed in us-east-1, so the organization's Region policy carries that exception.

@@ -1,7 +1,5 @@
 # ADR-003: Terraform reaches the Proxmox API at the cluster's virtual IP
 
-Accepted on Nov 17, 2026, by Daniel Faktor.
-
 ## Context
 
 Terraform manages Proxmox VMs through the bpg/proxmox provider, which needs one API endpoint and a token.
