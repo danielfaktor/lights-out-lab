@@ -35,7 +35,6 @@ The constraints:
 ### Good
 - Terraform doesn't depend on any service it manages.
 - The endpoint survives the loss of any one node.
-- No secret is stored in the repo or in Terraform files.
 
 ### Costs and trade-offs
 - With TLS verification off, a device on the path could pretend to be the API and capture the token. The traffic never leaves the home network, which keeps that exposure small, but it is real until certificates are fixed.

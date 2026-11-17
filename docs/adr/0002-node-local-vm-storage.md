@@ -19,7 +19,7 @@ The constraints:
 ## Decision
 
 1. VM disks live on each node's `local-lvm`. There is no shared or pooled storage under the VMs.
-2. Redundancy comes from the services, not the disks. Two Technitium VMs run on different nodes and sync zones between them. The reverse proxy is one VM, restored from its nightly vzdump backup if its node fails.
+2. The services provide the redundancy. Two Technitium VMs run on different nodes and sync zones between them. The reverse proxy is one VM, restored from its nightly vzdump backup if its node fails.
 3. Because `local-lvm` isn't shared, each node has its own copy of the Debian 13 template (moltres 9000, zapdos 9001, articuno 9002), built by `terraform/templates/build-debian13.sh`. The Terraform module clones the copy on the node it targets.
 4. Every VM runs the QEMU guest agent, installed on first boot by a cloud-init vendor-data snippet, because the Debian cloud image doesn't include it. The agent lets vzdump freeze the filesystems for a consistent backup, and lets Proxmox shut VMs down cleanly.
 5. Longhorn arrives with Kubernetes, inside the Kubernetes VMs, for pod volumes only.
@@ -37,7 +37,7 @@ The constraints:
 
 ### Good
 - VMs get the full speed of the local NVMe drive.
-- Storage adds no traffic to the one network port, so corosync isn't competing with replication.
+- Storage adds no traffic to the single network port, so nothing competes with corosync.
 - Nothing new to run or monitor: no storage cluster, no quorum for disks.
 - DNS survives the loss of any one node, because the second Technitium VM is on another node.
 
