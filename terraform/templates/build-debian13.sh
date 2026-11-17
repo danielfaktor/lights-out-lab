@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Build a Debian 13 cloud-init template on one Proxmox node. Runs locally; ssh's to the node.
-# Usage: templates/build-debian13.sh <node-ip> <vmid>   e.g. 192.168.10.6 9000
 set -euo pipefail
 node=${1:?node ip}; vmid=${2:?vmid}
 ssh -o IdentityAgent="${SSH_AUTH_SOCK}" "root@${node}" bash -s -- "$vmid" <<'REMOTE'
@@ -8,8 +6,6 @@ set -euo pipefail
 vmid=$1
 base=https://cloud.debian.org/images/cloud/trixie/latest
 img=debian-13-genericcloud-amd64.qcow2
-# Vendor-data snippet: installs qemu-guest-agent on first boot (Debian's cloud image doesn't ship it).
-# local is per-node storage, so each node needs its own copy. The module points vendor_data_file_id at it.
 mkdir -p /var/lib/vz/snippets
 cat > /var/lib/vz/snippets/qga-vendor.yaml <<'YAML'
 #cloud-config

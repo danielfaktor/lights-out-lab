@@ -1,4 +1,3 @@
-# Throwaway stack: proves apply → reachable VM → destroy. Run: source ../env.sh && terraform apply
 terraform {
   required_providers {
     proxmox = {
@@ -9,8 +8,6 @@ terraform {
 }
 
 provider "proxmox" {
-  # endpoint and token come from env.sh.
-  # shortcut: the VIP's cert is signed by the PVE cluster CA and lacks the VIP's IP; give the nodes an ACME cert for a VIP DNS name to drop this.
   insecure = true
 }
 
