@@ -1,7 +1,5 @@
 # Design: lights-out-lab
 
-Accepted. Last updated Nov 16, 2026, by Daniel Faktor.
-
 ## Context and scope
 
 I want to publish a real site, blog.danielfaktor.com, from a Kubernetes cluster in my homelab. A homelab is an unreliable origin: power, upgrades and experiments take it down. The home connection sits behind double NAT, and I don't want the home network listening on the internet at all. The design has to keep readers served through outages, cost little, and rebuild from code.
