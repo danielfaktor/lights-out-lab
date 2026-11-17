@@ -27,7 +27,7 @@ flowchart LR
 | Path | Purpose |
 | --- | --- |
 | `docs/` | Design doc, architecture decision records, AWS guardrails |
-| `terraform/` | Proxmox VMs and the AWS edge (planned) |
+| `terraform/` | Proxmox VM module and Debian 13 templates; the AWS edge (planned) |
 | `ansible/` | Node configuration and kubeadm (planned) |
 | `kubernetes/` | Argo CD applications (planned) |
 | `copilot/` | The AI copilot and its evals (planned) |
