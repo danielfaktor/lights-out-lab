@@ -1,0 +1,21 @@
+# Terraform: state and variable files hold secrets and account details
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+
+# Kubernetes and Ansible
+kubeconfig
+*.kubeconfig
+*.retry
+
+# Secrets and keys
+.env
+.env.*
+*.pem
+*.key
+
+# Local files
+.DS_Store
