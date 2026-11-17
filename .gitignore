@@ -5,6 +5,8 @@
 *.tfvars
 *.tfvars.json
 crash.log
+tfplan
+*.tfplan
 
 # Kubernetes and Ansible
 kubeconfig
