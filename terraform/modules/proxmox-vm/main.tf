@@ -72,7 +72,7 @@ resource "proxmox_virtual_environment_vm" "this" {
       }
     }
     dns {
-      servers = ["192.168.10.4"]
+      servers = ["192.168.20.2", "192.168.20.3", "192.168.20.1"]
     }
     user_account {
       username = "debian"
