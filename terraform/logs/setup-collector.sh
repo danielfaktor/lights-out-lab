@@ -29,10 +29,12 @@ cat > /etc/rsyslog.d/10-remote.conf <<'EOF'
 # Router syslog (UniFi SIEM) on UDP 514: one file per sender per day, kept out of /var/log/syslog.
 # secpath-replace stops a spoofed hostname from writing outside /var/log/remote.
 template(name="remoteDaily" type="string" string="/var/log/remote/%HOSTNAME:::secpath-replace%/%$now%.log")
+# UniFi stamps the header with UTC digits but a -08:00 offset; use our receive time. UNIFIutcTime stays in the message.
+template(name="received" type="string" string="%timegenerated:::date-rfc3339% %HOSTNAME% %syslogtag%%msg%\n")
 ruleset(name="remote") {
   # Only the router (its Lab-VMs address); anyone else on the VLAN could fill the disk.
   if $fromhost-ip == "192.168.20.1" then {
-    action(type="omfile" dynaFile="remoteDaily" dirCreateMode="0750" fileCreateMode="0640")
+    action(type="omfile" dynaFile="remoteDaily" template="received" dirCreateMode="0750" fileCreateMode="0640")
   }
   stop
 }

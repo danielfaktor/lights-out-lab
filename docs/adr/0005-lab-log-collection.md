@@ -15,9 +15,9 @@ The constraints:
 ## Decision
 
 1. One Debian VM, `logs` (VMID 102, 192.168.20.4 on articuno), with 1 core, 1 GB of RAM and 20 GB of disk, built by `terraform/logs` from the existing VM module and configured by `terraform/logs/setup-collector.sh`.
-2. The router pushes its logs to the VM over UDP 514 through the System Logging / SIEM integration (Network → Integrations), with all 14 categories and raw logs. The router sends from 192.168.20.1, and rsyslog accepts syslog from that address only. It writes one file per day under `/var/log/remote` on the VM's local disk, named by the date the collector received it.
+2. The router pushes its logs to the VM over UDP 514 through the System Logging / SIEM integration (Network → Integrations), with all 14 categories and raw logs. The router sends from 192.168.20.1, and rsyslog accepts syslog from that address only. It writes one file per day under `/var/log/remote` on the VM's local disk, named by the date the collector received it. Each line is stamped with the collector's receive time, because UniFi writes UTC digits with a -08:00 offset in the header. The router's own `UNIFIutcTime` field stays in every line.
 3. Everything else is pulled, once a night at 03:15, over read-only API keys:
-   - Technitium query logs from dns1 and dns2 through `/api/logs/download`, as the Technitium user `logs`, which can only view logs.
+   - Technitium query logs from dns1 and dns2 through `/api/logs/download`, as the Technitium user `logs`, which can only view logs. Each server has File logging, Log All Queries and Max Log File Days 7 set in its own Settings → Logging. Clustering doesn't copy these settings, so a rebuilt server needs them set again. Files are named by UTC date, and the job takes only days before the current one.
    - Proxmox journals for moltres, zapdos and articuno through `/nodes/<node>/journal`, with the token `logs@pve!collector`. The role `LogReader` holds only `Sys.Syslog`, on `/nodes`. Privilege separation is on, so the ACL is set on both the user and the token.
    - Each pull fills in any day from the last 7 that is missing, so a missed night repairs itself.
 4. The job then moves everything to the Synology share `lab-logs` on snorlax (192.168.10.5) over NFS. The share mounts on demand and unmounts after 10 minutes idle. 03:15 follows the 03:00 `dns-nightly` vzdump, so the disks are already awake. If the share isn't mounted, the job stops rather than filling the VM's disk.
@@ -47,6 +47,7 @@ The constraints:
 - Router syslog is UDP. Anything sent while the collector is down is lost.
 - Anything that can spoof 192.168.20.1 on the VLAN can still write to the router's log. Other senders are dropped.
 - Firewall hits only reach the log for policies that have syslog logging turned on.
+- Changing the VM module's cloud-init settings, such as its DNS servers, reboots the collector and gives it new SSH host keys. Verify the new fingerprint with `qm guest exec 102 -- ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` before trusting it.
 - No alerting. A failed run shows only in `journalctl -u logs-nightly` on the VM.
 - The logs exist only on snorlax. A ransomware attack or NAS failure takes them all.
 
