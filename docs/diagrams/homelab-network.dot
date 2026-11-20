@@ -21,7 +21,7 @@ digraph homelab {
 
   ap       [label=<<b>Squirtle</b>, U7 Pro Wall AP<br/><font point-size="9">mgmt 192.168.10.2</font>>, fillcolor="#e6eef8", color="#2f5f98"]
   sw       [label=<<b>Magneton</b>, USW-Lite-16-PoE<br/><font point-size="9">mgmt 192.168.10.3</font>>, fillcolor="#e6eef8", color="#2f5f98"]
-  alakazam [label=<<b>ALAKAZAM</b>, Pi Zero 2 W<br/><font point-size="9">old Pi-hole, powered off</font>>,
+  alakazam [label=<<b>ALAKAZAM</b>, Pi Zero 2 W<br/><font point-size="9">old Pi-hole, being retired</font>>,
             style="rounded,dashed", color="#999999", fontcolor="#777777"]
 
   subgraph cluster_default {

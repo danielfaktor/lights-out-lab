@@ -178,7 +178,7 @@
 <path fill="none" stroke="#999999" stroke-dasharray="5,2" d="M721.51,-697.69C721.51,-697.69 594.49,-697.69 594.49,-697.69 588.49,-697.69 582.49,-691.69 582.49,-685.69 582.49,-685.69 582.49,-673.69 582.49,-673.69 582.49,-667.69 588.49,-661.69 594.49,-661.69 594.49,-661.69 721.51,-661.69 721.51,-661.69 727.51,-661.69 733.51,-667.69 733.51,-673.69 733.51,-673.69 733.51,-685.69 733.51,-685.69 733.51,-691.69 727.51,-697.69 721.51,-697.69"/>
 <text xml:space="preserve" text-anchor="start" x="588.25" y="-680.24" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00" fill="#777777">ALAKAZAM</text>
 <text xml:space="preserve" text-anchor="start" x="655.75" y="-680.24" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#777777">, Pi Zero 2 W</text>
-<text xml:space="preserve" text-anchor="start" x="605.5" y="-671.14" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#777777">old Pi&#45;hole, powered off</text>
+<text xml:space="preserve" text-anchor="start" x="602.88" y="-671.14" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#777777">old Pi&#45;hole, being retired</text>
 </g>
 <!-- udr7&#45;&gt;alakazam -->
 <g id="edge5" class="edge">
