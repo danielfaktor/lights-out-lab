@@ -1,0 +1,134 @@
+digraph homelab {
+  graph [rankdir=TB, newrank=true, compound=true, nodesep=0.22, ranksep=0.3, pad=0.2,
+         fontname="Helvetica", fontsize=18, labelloc=t, bgcolor=white,
+         label=<<b>Homelab network</b><br/><font point-size="11" color="#555555">UniFi zones and VLANs, physical links, and the main service flows</font><br/> >]
+  node  [shape=box, style="rounded,filled", fillcolor=white, color="#666666", penwidth=1,
+         fontname="Helvetica", fontsize=11, margin="0.08,0.04"]
+  edge  [color="#555555", fontname="Helvetica", fontsize=9, fontcolor="#444444", arrowsize=0.6]
+
+  subgraph cluster_internet {
+    label=<<b>Internet</b>>; fontsize=12; style="rounded,filled"; fillcolor="#f3f3f3"; color="#bbbbbb"
+    remote     [label=<<b>Remote laptop</b><br/><font point-size="9">WiFiman Teleport</font>>]
+    cloudflare [label=<<b>Cloudflare</b><br/><font point-size="9">public DNS, DoT resolvers</font>>]
+    unifi      [label=<<b>UniFi cloud</b><br/><font point-size="9">Teleport broker, backups</font>>]
+    aws        [label=<<b>AWS edge</b><br/><font point-size="9">CloudFront + relay, planned</font>>,
+                style="rounded,dashed", color="#999999", fontcolor="#777777"]
+  }
+
+  att  [label=<<b>AT&amp;T BGW320</b> + fiber ONT<br/><font point-size="9">IP passthrough: the router holds the public IPv4</font>>, fillcolor="#f3f3f3"]
+  udr7 [label=<<b>Pikachu</b>, UniFi Dream Router 7<br/><font point-size="9">gateway .1 on every VLAN, DHCP, zone firewall (default deny)<br/>IPS in block mode, Region Blocking, built-in Wi-Fi AP</font>>,
+        fillcolor="#e6eef8", color="#2f5f98", penwidth=1.6]
+
+  ap       [label=<<b>Squirtle</b>, U7 Pro Wall AP<br/><font point-size="9">mgmt 192.168.10.2</font>>, fillcolor="#e6eef8", color="#2f5f98"]
+  sw       [label=<<b>Magneton</b>, USW-Lite-16-PoE<br/><font point-size="9">mgmt 192.168.10.3</font>>, fillcolor="#e6eef8", color="#2f5f98"]
+  alakazam [label=<<b>ALAKAZAM</b>, Pi Zero 2 W<br/><font point-size="9">old Pi-hole, powered off</font>>,
+            style="rounded,dashed", color="#999999", fontcolor="#777777"]
+
+  subgraph cluster_default {
+    label=<<b>Default</b>  VLAN 1<br/><font point-size="9">192.168.0.0/24, zone Internal</font>>;
+    fontsize=11; style="rounded,filled"; fillcolor="#e8f5e9"; color="#5a9e62"
+    home [label=<Macs, iPhones,<br/>printer, media<br/><font point-size="9">Wi-Fi 2.4, 5, 6 GHz</font>>]
+  }
+  subgraph cluster_work {
+    label=<<b>Work</b>  VLAN 30<br/><font point-size="9">192.168.30.0/24, zone Work</font>>;
+    fontsize=11; style="rounded,filled"; fillcolor="#fff6e0"; color="#c9962b"
+    work [label=<Work laptop<br/><font point-size="9">Wi-Fi 5, 6 GHz</font>>]
+  }
+  subgraph cluster_iot {
+    label=<<b>IoT</b>  VLAN 40<br/><font point-size="9">192.168.40.0/24, zone IoT</font>>;
+    fontsize=11; style="rounded,filled"; fillcolor="#fdeaea"; color="#c25b5b"
+    iot [label=<Smart-home<br/>devices<br/><font point-size="9">Wi-Fi 2.4 GHz only</font>>]
+  }
+
+  subgraph cluster_lab10 {
+    label=<<b>Lab-Infra</b>  VLAN 10  192.168.10.0/24<br/><font point-size="9">zone Lab-Mgmt</font>>;
+    fontsize=11; style="rounded,filled"; fillcolor="#e3edf9"; color="#2f5f98"
+
+    nidoking [label=<<b>nidoking</b> .12, Pi 4<br/><font point-size="9">Nginx Proxy Manager, *.danielfaktor.net<br/>switch port 3</font>>]
+    pis      [label=<<b>blastoise</b> .10  <b>pidgeot</b> .11  <b>gengar</b> .13<br/><b>arcanine</b> .14  <b>raichu</b> .15<br/><font point-size="9">Pi 4, DietPi, Docker, idle<br/>switch ports 1, 2, 4-6</font>>]
+    snorlax  [shape=cylinder, style=filled, fillcolor=white,
+              label=<<b>snorlax</b> .5<br/><font point-size="9">Synology DS923+<br/>NFS: backups, lab logs<br/>switch ports 11+12, bonded</font>>]
+
+    subgraph cluster_pve {
+      label=<<b>Proxmox VE cluster POKEDEX</b><br/><font point-size="9">3× Lenovo M910Q, switch ports 13-15 (VLAN 20 tagged)</font>>;
+      fontsize=10; style="rounded,filled"; fillcolor="#f7f9fd"; color="#7d9cc4"
+      vip      [label=<<b>pve VIP</b> .9:8006<br/><font point-size="9">keepalived</font>>, style="rounded,filled,dashed"]
+      moltres  [label=<<b>moltres</b> .6>]
+      zapdos   [label=<<b>zapdos</b> .7>]
+      articuno [label=<<b>articuno</b> .8>]
+    }
+  }
+
+  subgraph cluster_lab20 {
+    label=<<b>Lab-VMs</b>  VLAN 20  192.168.20.0/24<br/><font point-size="9">zone Lab-VMs</font>>;
+    fontsize=11; style="rounded,filled"; fillcolor="#efe9f8"; color="#7a5aa8"
+
+    subgraph cluster_dns {
+      label=<<font point-size="9">Technitium pair: DNS 1 and 2 on every network<br/>upstream Cloudflare over DoT (853)</font>>;
+      style="rounded,dashed"; color="#1f8a8a"
+      dns1 [label=<<b>dns1</b> .20.2<br/><font point-size="9">CT 100, primary</font>>]
+      dns2 [label=<<b>dns2</b> .20.3<br/><font point-size="9">CT 101</font>>]
+    }
+    logs [label=<<b>logs</b> .20.4<br/><font point-size="9">VM 102, log collector<br/>router syslog in, UDP 514</font>>]
+  }
+
+  legend [shape=plaintext, style="", margin=0, label=<
+    <table border="0" cellborder="0" cellspacing="1" cellpadding="1">
+      <tr><td align="left" colspan="4"><font point-size="10"><b>Legend</b></font></td></tr>
+      <tr>
+        <td align="left"><font point-size="12" color="#444444"><b>━━━</b></font></td><td align="left"><font point-size="9">cable (port, speed)  </font></td>
+        <td align="left"><font point-size="12" color="#2f5f98"><b>━━━</b></font></td><td align="left"><font point-size="9">HTTPS via the reverse proxy</font></td>
+      </tr>
+      <tr>
+        <td align="left"><font point-size="12" color="#777777"><b>· · · ·</b></font></td><td align="left"><font point-size="9">Wi-Fi</font></td>
+        <td align="left"><font point-size="12" color="#7a5aa8"><b>━━━</b></font></td><td align="left"><font point-size="9">logs and backups to the NAS</font></td>
+      </tr>
+      <tr>
+        <td align="left"><font point-size="12" color="#777777"><b>‒ ‒ ‒</b></font></td><td align="left"><font point-size="9">guest runs on node</font></td>
+        <td align="left"><font point-size="12" color="#3d8b45"><b>━━━</b></font></td><td align="left"><font point-size="9">remote access</font></td>
+      </tr>
+      <tr>
+        <td align="left"><font point-size="12" color="#aaaaaa"><b>‒ ‒ ‒</b></font></td><td align="left" colspan="3"><font point-size="9">grey dashed: planned or retired</font></td>
+      </tr>
+    </table>>]
+
+  { rank=same; att }
+  { rank=same; udr7 }
+  { rank=same; ap; sw; alakazam }
+  { rank=same; nidoking; pis }
+  { rank=same; snorlax; moltres; zapdos; articuno }
+  { rank=same; dns1; dns2; logs }
+
+  cloudflare -> att [ltail=cluster_internet, dir=none, penwidth=2, label=" 1 GbE fiber"]
+  att  -> udr7     [dir=none, penwidth=2, label=" WAN, 2.5 GbE"]
+  udr7 -> ap       [dir=none, penwidth=2, label=" port 2\n 2.5 GbE"]
+  udr7 -> sw       [dir=none, penwidth=2, label=" port 3\n 1 GbE"]
+  udr7 -> alakazam [dir=none, style=dashed, color="#999999", fontcolor="#777777", label=" port 1\n PoE"]
+
+  ap -> home [lhead=cluster_default, dir=none, style=dotted, color="#888888"]
+  ap -> work [lhead=cluster_work,    dir=none, style=dotted, color="#888888"]
+  ap -> iot  [lhead=cluster_iot,     dir=none, style=dotted, color="#888888"]
+
+  sw -> pis [lhead=cluster_lab10, dir=none, penwidth=2, label=" 1 GbE to\n every lab host"]
+  work -> nidoking [style=invis]
+  work -> pis [style=invis]
+
+  nidoking -> vip   [color="#2f5f98", fontcolor="#2f5f98", label=" pve"]
+  vip -> zapdos     [style=invis]
+  pis -> snorlax    [style=invis]
+  nidoking -> snorlax [color="#2f5f98", fontcolor="#2f5f98", label=" nas"]
+  nidoking -> dns1  [lhead=cluster_dns, color="#2f5f98", fontcolor="#2f5f98", constraint=false, label=" dns admin UI"]
+
+  moltres  -> dns1 [style=dashed, color="#888888", arrowhead=none]
+  zapdos   -> dns2 [style=dashed, color="#888888", arrowhead=none]
+  articuno -> logs [style=dashed, color="#888888", arrowhead=none]
+
+  moltres -> snorlax [ltail=cluster_pve, color="#7a5aa8", constraint=false]
+  logs -> snorlax    [color="#7a5aa8", fontcolor="#7a5aa8", constraint=false, label="NFS, nightly"]
+
+  remote -> udr7 [color="#3d8b45", fontcolor="#3d8b45", penwidth=1.3, constraint=false, label="Teleport\ntunnel"]
+  udr7 -> unifi  [color="#bbbbbb", style=dotted, constraint=false, arrowhead=none]
+  udr7 -> aws    [style=dashed, color="#999999", fontcolor="#777777", constraint=false, label="IPsec dialed out\n(planned)"]
+
+  dns2 -> legend [style=invis]
+}
