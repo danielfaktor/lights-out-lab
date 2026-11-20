@@ -2,8 +2,6 @@
 
 ![Homelab network: zones, VLANs, physical links and service flows](./homelab-network.png)
 
-The lab's network from the internet edge down to the guests on the Proxmox cluster: the five VLANs and their firewall zones, how each device is cabled, and the flows that cross zones. A scalable version is in [homelab-network.svg](./homelab-network.svg), and the source is [homelab-network.dot](./homelab-network.dot).
-
 ## Networks
 
 | Network | VLAN | Subnet | Firewall zone | What lives there |
@@ -34,23 +32,3 @@ Traffic between zones is denied unless a policy allows it, and replies to allowe
 - **Proxmox.** Three nodes, each with one NVMe disk and one 1 GbE link trunked for VLANs 10 and 20. Guests live on node-local storage, and redundancy comes from the services ([ADR-002](../adr/0002-node-local-vm-storage.md)). Terraform and browsers use the keepalived VIP ([ADR-003](../adr/0003-terraform-proxmox-endpoint.md)). A nightly vzdump job backs the DNS containers up to the NAS.
 - **Logs.** The router sends syslog to `logs`. Each night the collector pulls the DNS query logs and the Proxmox journals, then moves everything to the NAS over NFS ([ADR-005](../adr/0005-lab-log-collection.md)).
 - **Remote access.** UniFi Teleport only. Clients land in the VPN zone.
-
-The diagram shows only what is running today. The planned tunnel from the router to AWS is in the [design](../design.md).
-
-## About this diagram
-
-GraphViz fits this better than nwdiag, the usual choice for network topology. nwdiag lays every host out in one row per network, which would be about twenty boxes wide here. It also can't show flows between zones. GraphViz keeps the layout in vertical tiers (internet, ISP gateway, router, AP and switch) and then splits into two columns: Wi-Fi networks under the access point, the wired lab under the switch. Each firewall zone is a box, and each guest sits directly under the node it runs on.
-
-- **Zone colors** follow trust: green for the trusted home LAN, amber for Work, red for IoT, blue for lab management, purple for lab guests.
-- **Lines** carry meaning: thick dark lines are cables with their port and speed, dotted is Wi-Fi, grey dashed joins a guest to its node, purple is logs and backups to the NAS, and green is remote access. Labels on colored lines use the line's color, dark enough for 4.5:1 contrast on white.
-- **Simplifications.** One cable edge runs from the switch to Lab-Infra, and each host's label carries its switch ports. Both the router and the access point broadcast the three SSIDs; one dotted line stands for both. The reverse proxy's targets are listed on nidoking rather than drawn, so no line crosses the Proxmox cluster. The five idle Pis share one box. Client devices are examples, not an inventory. Unused switch ports are left out.
-
-To re-render after editing the source:
-
-```bash
-cd docs/diagrams
-for f in png svg; do
-  curl -s -X POST "https://kroki.io/graphviz/$f" -H "Content-Type: text/plain" \
-    --data-binary @homelab-network.dot -o "homelab-network.$f"
-done
-```
